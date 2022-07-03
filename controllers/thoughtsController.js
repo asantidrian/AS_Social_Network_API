@@ -30,12 +30,16 @@ module.exports = {
     Thoughts.create(req.body)
       .then((thoughtsData) => {
         return Users.findOneAndUpdate(
-          { _id: req.body.userId },
+          // { _id: req.body.userId },
           // { _id: params.userId },
+          { username: req.body.username },
           { $push: { thoughts: { thoughtsId: req.param.thoughtsId } } },
           //thoughts: thoughtsData._id
           { new: true });
       })
+      // { username: req.body.username },
+      // { $addToSet: { thoughts: thought._id } },
+      // { new: true }
       .then(userData => {
         if (!userData) {
           res.status(404).json({ message: 'No user found with this id!' });
