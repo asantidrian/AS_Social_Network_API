@@ -2,14 +2,22 @@ const { Users, Thoughts } = require('../models');
 
 module.exports = {
   // Get all thoughts
-  getThoughts(req, res) {
-    Thoughts.find({})
-      .populate({ path: 'reactions', select: '-__v' })
-      .select('-__v')
-      .then((thoughtsData) => res.json(thoughtsData))
-      .catch((err) => res.status(500).json(err));
-  },
+  // getThoughts(req, res) {
+  //   Thoughts.find({})
+  //     .then((thoughtsData) => res.json(thoughtsData))
+  //     .catch((err) => res.status(500).json(err));
+  // },
 
+  getThoughts(req, res) {
+    Thoughts.find()
+      .select('-__v')
+      .then(async (thoughtsData) => {
+        res.json(thoughtsData);
+      })
+      .catch((err) => {
+        return res.status(500).json(err);
+      });
+  },
   // Get an single thought
   getSingleThought(req, res) {
     Users.findOne({ _id: req.params.thoughtId })
@@ -17,7 +25,7 @@ module.exports = {
       .select('-__v')
       .then(thoughtsData => {
         if (!thoughtsData) {
-          res.status(404).json({ message: 'No thoughts with this particular ID!' });
+          res.status(404).json({ message: 'No thoughts with this ID!' });
           return;
         }
         res.json(thoughtsData)
@@ -31,15 +39,12 @@ module.exports = {
       .then((thoughtsData) => {
         return Users.findOneAndUpdate(
           // { _id: req.body.userId },
-          // { _id: params.userId },
-          { username: req.body.username },
-          { $push: { thoughts: { thoughtsId: req.param.thoughtsId } } },
+          { _id: req.params.userId },
+          // { username: req.body.username },
+          { $addToSet: { thoughts: thoughtsData._id } },
           //thoughts: thoughtsData._id
           { new: true });
       })
-      // { username: req.body.username },
-      // { $addToSet: { thoughts: thought._id } },
-      // { new: true }
       .then(userData => {
         if (!userData) {
           res.status(404).json({ message: 'No user found with this id!' });
@@ -47,7 +52,7 @@ module.exports = {
         }
         res.json(userData);
       })
-      .catch(err => res.Status(500).json(err));
+      .catch(err => res.status(500).json(err));
   },
 
   // Create a new thought
@@ -60,7 +65,7 @@ module.exports = {
       .select('-___v')
       .then(thoughtsData => {
         if (!thoughtsData) {
-          res.status(404).json({ message: 'No thoughts with this particular ID!' });
+          res.status(404).json({ message: 'No thoughts with this ID!' });
           return;
         }
         res.json(thoughtsData);
@@ -74,7 +79,7 @@ module.exports = {
       { _id: req.params.thoughtId })
       .then(thoughtsData => {
         if (!thoughtsData) {
-          res.status(404).json({ message: 'No thoughts with this particular ID!' });
+          res.status(404).json({ message: 'No thoughts with this ID!' });
           return;
         }
         res.json(thoughtsData);
@@ -92,7 +97,7 @@ module.exports = {
       .select('-__v')
       .then(thoughtsData => {
         if (!thoughtsData) {
-          res.status(404).json({ message: 'No thoughts with this particular ID!' });
+          res.status(404).json({ message: 'No thoughts with this ID!' });
           return;
         }
         res.json(thoughtsData);

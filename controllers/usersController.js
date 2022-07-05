@@ -63,7 +63,6 @@ module.exports = {
           return;
         }
         res.json({ message: 'Users and Thoughts deleted!' })
-        res.json(userData)
 
       })
       .catch((err) => res.status(500).json(err));
@@ -71,7 +70,7 @@ module.exports = {
 
   addFriend(req, res) {
     Users.findOneAndUpdate(
-      { _id: req.param.userId },
+      { _id: req.params.userId },
       { $addToSet: { friends: req.params.friendId } },
       { new: true })
       // .populate({ path: 'friends', select: ('-__v') })
@@ -87,8 +86,10 @@ module.exports = {
   },
   deleteFriend(req, res) {
     Users.findOneAndDelete(
-      { _id: req.param.userId },
+      { _id: req.params.userId },
       { $pull: { friends: { friendId: req.params.friendId } } },
+      // { $pull: { friends: req.params.friendId } },
+
       { new: true })
       // .populate({ path: 'friends', select: ('-__v') })
       // .select('-__v')
