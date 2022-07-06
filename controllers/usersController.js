@@ -87,14 +87,14 @@ module.exports = {
   deleteFriend(req, res) {
     Users.findOneAndUpdate(
       { _id: req.params.userId },
-      { $pull: { friends: { friendId: req.params.friendId } } },
+      { $pull: { friends: req.params.friendId } },
       { new: true })
       .then(userData => {
         if (!userData) {
           res.status(404).json({ message: 'No User with this particular ID!' });
           return;
         }
-        res.json(userData);
+        res.json({ message: 'friend deleted', userData });
       })
       .catch((err) => res.status(500).json(err));
   },
