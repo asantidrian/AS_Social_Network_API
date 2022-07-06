@@ -1,13 +1,12 @@
-const { Schema, model } = require('mongoose');
+// const { Schema, model } = require('mongoose');
 const moment = require('moment');
-// const { Schema, model, Types } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 const reactionSchema = new Schema(
   {
     reactionId: {
       type: Schema.Types.ObjectId,
-      required: true,
-      maxLength: 280,
+      default: () => new Types.ObjectId()
     },
 
     reactionBody: {
@@ -18,7 +17,7 @@ const reactionSchema = new Schema(
     username: {
       type: String,
       required: true,
-      unique: true,
+
     },
     createdAt: {
       type: Date,
@@ -31,7 +30,8 @@ const reactionSchema = new Schema(
     toJSON: {
       virtuals: true,
       getters: true,
-    }
+    },
+    id: false,
   },
 
 )
@@ -55,10 +55,9 @@ const thoughtsSchema = new Schema(
     username: {
       type: String,
       required: true,
-      unique: true
     },
 
-    reactions: reactionSchema,
+    reactions: [reactionSchema]
   },
   {
     toJSON: {

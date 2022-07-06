@@ -1,4 +1,4 @@
-# 18 NoSQL: Social Network API
+# Social Network API
 
 ## Your Task
 

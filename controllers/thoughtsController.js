@@ -2,25 +2,22 @@ const { Users, Thoughts } = require('../models');
 
 module.exports = {
   // Get all thoughts
-  // getThoughts(req, res) {
-  //   Thoughts.find({})
-  //     .then((thoughtsData) => res.json(thoughtsData))
-  //     .catch((err) => res.status(500).json(err));
-  // },
-
   getThoughts(req, res) {
     Thoughts.find()
+      .populate({ path: 'reactions', select: '-__v' })
       .select('-__v')
-      .then(async (thoughtsData) => {
+      .then((thoughtsData) => {
         res.json(thoughtsData);
       })
       .catch((err) => {
         return res.status(500).json(err);
       });
   },
-  // Get an single thought
+
   getSingleThought(req, res) {
-    Users.findOne({ _id: req.params.thoughtId })
+    Thoughts.findOne(
+      { _id: req.params.thoughtId }
+    )
       .populate({ path: 'reactions', select: '-__v' })
       .select('-__v')
       .then(thoughtsData => {
@@ -33,28 +30,25 @@ module.exports = {
       .catch((err) => res.Status(500).json(err));
   },
 
-  // Create a new thought
   createThought(req, res) {
     Thoughts.create(req.body)
       .then((thoughtsData) => {
         return Users.findOneAndUpdate(
-          // { _id: req.body.userId },
-          { _id: req.params.userId },
-          // { username: req.body.username },
+          { username: req.body.username },
           { $addToSet: { thoughts: thoughtsData._id } },
-          //thoughts: thoughtsData._id
           { new: true });
       })
-      .then(userData => {
-        if (!userData) {
-          res.status(404).json({ message: 'No user found with this id!' });
+      .then(thoughtsData => {
+        if (!thoughtsData) {
+          res.status(404).json({ message: 'No thoughts with this particular ID!' });
           return;
         }
-        res.json(userData);
+        res.json(thoughtsData)
       })
-      .catch(err => res.status(500).json(err));
+      .catch((err) => {
+        res.status(500).json(err);
+      });
   },
-
   // Create a new thought
   updateThought(req, res) {
     Thoughts.findOneAndUpdate(
@@ -68,7 +62,7 @@ module.exports = {
           res.status(404).json({ message: 'No thoughts with this ID!' });
           return;
         }
-        res.json(thoughtsData);
+        res.json({ message: 'thought updated', thoughtsData });
       })
       .catch(err => res.Status(500).json(err));
   },
@@ -82,7 +76,7 @@ module.exports = {
           res.status(404).json({ message: 'No thoughts with this ID!' });
           return;
         }
-        res.json(thoughtsData);
+        res.json({ message: 'thought deleted', thoughtsData });
       })
       .catch(err => res.status(500).json(err));
   },
@@ -110,20 +104,16 @@ module.exports = {
   deleteReaction(req, res) {
     Thoughts.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reactions: { reactionId: req.params.reactionId } } },
+      { $pull: { reactions: { _id: req.params.reactionId } } },
       { new: true })
       .then(thoughtsData => {
         if (!thoughtsData) {
-          res.status(404).json({ message: 'No thoughts with this particular ID!' });
+          res.status(404).json({ message: 'No thoughts with this ID!' });
           return;
         }
-        res.json(thoughtsData);
+        res.json({ message: 'reaction deleted', thoughtsData });
       })
       .catch(err => res.status(500).json(err));
   }
-
-
-
-
 }
 
